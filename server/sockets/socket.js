@@ -31,7 +31,7 @@ io.on('connection', (client) => {
         //Este evento se ejecuta cada vez que una persona entra o sale del chat
         client.broadcast.to(data.sala).emit('listaPersona', usuarios.getPersonasPorSala(data.sala));
 
-
+        client.broadcast.to(data.sala).emit('crearMensaje', crearMensaje('Administrador', `${ data.nombre} se unió`));
 
         callback(usuarios.getPersonasPorSala(data.sala));
 
@@ -39,11 +39,15 @@ io.on('connection', (client) => {
 
 
     //notificar a todos los usuarios
-    client.on('crearMensaje', (data) => {
+    client.on('crearMensaje', (data, callback) => {
         let persona = usuarios.getPersona(client.id);
         let mensaje = crearMensaje(persona.nombre, data.mensaje);
 
         client.broadcast.to(persona.sala).emit('crearMensaje', mensaje);
+
+
+        //notificar cuando se recibe el mensaje
+        callback(mensaje);
 
     })
 
